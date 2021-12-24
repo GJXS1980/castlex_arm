@@ -29,7 +29,7 @@ class grasp_object:
         # # 订阅气泵状态
         rospy.Subscriber("control_test", Int64, self.control_data)
 
-        self.control_state_data_pub = rospy.Publisher("control_arm", Int64, queue_size=1)
+
 
         self.HG_DR_C = HG_DR_SDK()
 
@@ -37,8 +37,7 @@ class grasp_object:
         self.HG_DR_C.connectHG_DR()
         #   机械臂归零
         self.HG_DR_C.calibrateJoint()
-        #self.HG_DR_C.moveAnInterval(10, -30, 120)
-        self.HG_DR_C.moveAnInterval(10, -30, 120)
+        self.HG_DR_C.moveAnInterval(0, 0, 120)
         # time.sleep(3)
 
            
@@ -66,48 +65,22 @@ class grasp_object:
         # self.push_z = rospy.get_param('~drop_off_z')
 
         # self.HG_DR_C.moveAnInterval(20, 20, 0)
-        self.control_pump(0)
-        time.sleep(1)
+
 
         while(1):
                 #print(self.x, self.y, self.side)
             	if self.id == 1:
-                    x = 85*(self.y - 239.5)/self.side - 55
-                    y = -85*(self.x - 319.5)/self.side + 10
-                    time.sleep(1)
+                    x = 85*(self.y - 239.5)/self.side - 50
+                    y = -85*(self.x - 319.5)/self.side + 2
                     print(x,y)
-                    self.HG_DR_C.moveAnInterval(x, y, -154)
-                    time.sleep(1)
+                    self.HG_DR_C.moveAnInterval(x, y, -68)
+                    self.id = 0
                     #self.HG_DR_C.moveAnInterval(0, 0, -65)
-                    self.control_pump(1)
+                    self.HG_DR_C.controlPump(1)
                     time.sleep(1)
-                    self.HG_DR_C.moveAnInterval(-x, -y, 154)
-                    time.sleep(1)
-                    self.id = 3
-                elif self.id == 2:
-                    self.HG_DR_C.moveAnInterval(0, 0, 68)                                     
-                    time.sleep(1)
-                    self.control_pump(0)
-                    time.sleep(1)
-                    self.id = 0
-                elif self.id == 3:
-                    self.HG_DR_C.move_to_angle(100, 15, 15)                                    
-                    time.sleep(1)
-                    self.HG_DR_C.moveAnInterval(-80, 40, 0)
-                    time.sleep(1)
-                    self.control_pump(0)
-                    time.sleep(6)
-                    self.HG_DR_C.moveAnInterval(80, -40,0)                                     
-                    time.sleep(1)
-                    #self.control_pump(0)
-                    #time.sleep(1)
-                    self.HG_DR_C.move_to_angle(0, 20, 5)
-                    time.sleep(1)
-                    #self.HG_DR_C.moveAnInterval(0, 20, 5)
-                    self.id = 0
-                    time.sleep(1)
-                    self.control_state_data_pub.publish(1)
-                    time.sleep(1)
+                    self.HG_DR_C.moveAnInterval(-x, -y, 68)
+                    self.HG_DR_C.controlPump(0)
+
         #break
 		#rospy.spin()
 
@@ -125,17 +98,17 @@ class grasp_object:
     #   控制气泵
     def control_pump(self, data):
         #   打开气泵
-        if data == 1:
+        if data.data == 1:
             self.HG_DR_C.controlPump(1)
             time.sleep(1.0)
             print("Pump start!!")
         # 关闭气泵
-        if data == 0:
+        if data.data == 0:
             self.HG_DR_C.controlPump(0)
             time.sleep(1.0)
             print("Pump end!!")
         # 参数初始化
-        if data == 2:
+        if data.data == 2:
             self.start_grasp = True
             print("ready to grasp again!!")
 

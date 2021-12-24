@@ -5,7 +5,7 @@ import roslib
 import time
 import rospy
 from geometry_msgs.msg import Pose, Point, Quaternion, Twist
-from std_msgs.msg import Float32MultiArray, Int32, Float32
+from std_msgs.msg import Float32MultiArray, Int32, Float32, Int64
 from sensor_msgs.msg import Image, CompressedImage
 
 import paho.mqtt.client as mqtt
@@ -30,7 +30,7 @@ class arm():
         #   订阅mqtt话题
         self.on_subscribe()
 
-        self.action = False
+        self.action, self.control_state_data = False, 0
         self.castlex, self.arm = False, False
         self.sub_name, self.sub_dir, self.sub_action, self.sub_feedback, self.sub_msg = None, None, None, None, None
         #   初始化ros节点
@@ -40,8 +40,9 @@ class arm():
         # 机械臂话题
         rospy.Subscriber('/grasp_state', Int32, self.arm_grasp_state)
         self.arm_target = rospy.Publisher("grasp_target", Int32, queue_size=1)
-
-
+        rospy.Subscriber('/control_arm', Int64, self.control_state)
+        self.robotInitDone_pub = rospy.Publisher("robotInitDone", Int64, queue_size=1)
+        self.control_pub = rospy.Publisher("control_test", Int64, queue_size=1)
         #   订阅图像话题
         rospy.Subscriber('/usb_cam/image_raw', Image, self.mqtt_data)
         rospy.Subscriber('/usb_cam/image_raw/compressed', CompressedImage, self.mqtt_pub)
@@ -49,6 +50,10 @@ class arm():
         self.rate = rospy.Rate(50)
         rospy.spin()
     
+    def control_state(self, data):
+        self.control_state_data = data.data
+
+
     def arm_grasp_state(self, data):
         if data.data == 1:
             self.arm = True
@@ -61,11 +66,17 @@ class arm():
         elif self.sub_action == "loading" and self.sub_feedback == 1:
             self.castlex = False
         if self.action:
-            print("test")
-            self.arm_target.publish(1)
-            print("done")
-            # self.arm = True
-            self.action = False
+            if self.control_state_data == 0:
+                self.robotInitDone_pub.publish(8)
+                time.sleep(5)
+                self.control_pub.publish(1)
+                time.sleep(3)
+                self.control_state_data = -1
+            elif self.control_state_data == 1:
+                print("done")
+                self.action = False
+                self.arm = True
+                self.control_state_data = 0
             
     #   发布Mqtt信息
     def mqtt_pub(self, data): 

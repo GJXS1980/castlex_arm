@@ -7,7 +7,7 @@
     </node>
 
     <node pkg="hg_desk_robot" name="arm_mqtt" type="arm_mqtt_ros.py" output="screen">
-    <param name="mqtt_host" value="192.168.220.89"/>
+    <param name="mqtt_host" value="192.168.10.3"/>
     <param name="mqtt_prot" value="50001"/>
     </node>
 

@@ -55,7 +55,7 @@ class grasp_object:
             print("ready to grasp again!!")
 
     def robot_move(self, move_type):
-	time.sleep(5.0)
+        time.sleep(5.0)
         x = 69 * (self.target_y - 239.5) / self.target_side - 50
         y = -85 * (self.target_x - 319.5) / self.target_side + 2
 
