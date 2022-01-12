@@ -296,9 +296,15 @@ class HG_DR_SDK:
 
     # 控制气泵
     def controlPump(self, state):
-        result=self.HG_DR.controlPump(state)
-        self.pump_state = not self.pump_state
-        return result
+        result = self.HG_DR.controlPump(state)
+        if state == 0:
+            self.pump_state = False
+        elif state == 1:
+            self.pump_state = True
+        else:
+            pass
+        # self.pump_state = not self.pump_state
+        # return result
 
     # 指示灯颜色设置，输入颜色或者对应的数值
     def controlRGBlight(self, colorNum):

@@ -103,7 +103,7 @@ class arm():
     def on_message_come(self, lient, userdata, msg):
 	# python3 bytes转str
         self.sub_msg = json.loads(msg.payload.encode('utf-8'))#str(msg.payload, 'utf-8')
-	print(self.sub_msg)
+        print(self.sub_msg)
 	    # python3 str转字典
         #self.sub_msg = ast.literal_eval(self.sub_msg)
         if len(self.sub_msg) == 5:
